@@ -52,12 +52,12 @@ def compute_mandelbrot(x_min=-2.0, x_max=1.0, y_min=-1.5, y_max=1.5, width=1024,
 
     x_values = np.linspace(x_min, x_max, width)
     y_values = np.linspace(y_min, y_max, height)
-    n_iterations = []
+    n_iterations = np.zeros((width, height), dtype=int)
 
-    for x in x_values:
-        for y in y_values:
+    for i, x in enumerate(x_values):
+        for j, y in enumerate(y_values):
             c = complex(x, y)
-            n_iterations.append(mandelbrot_point(c))
+            n_iterations[i, j] = mandelbrot_point(c)
     
     return n_iterations
 
@@ -72,6 +72,12 @@ if __name__ == "__main__":
 
     elapsed = time.time() - start
     print(f"Computation took {elapsed:.3f} seconds")
+
+    plt.imshow(n_iterations, extent=(-2, 1, -1.5, 1.5), cmap='twilight', origin='lower')
+    plt.colorbar()
+    plt.title('Mandelbrot')
+    plt.show()
+    plt.savefig('mandelbrot.png')
 
 
         
