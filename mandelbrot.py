@@ -3,6 +3,8 @@ Mandelbrot Set Generator
 Author : Chiara Caselli
 Course : Numerical Scientific Computing 2026
 """
+import numpy as np
+import matplotlib.pyplot as plt
 
 def mandelbrot_point(c):
     """
@@ -28,8 +30,34 @@ def mandelbrot_point(c):
 
     return max_iter
 
+def compute_mandelbrot():
+    """
+    Function that returns a list with the number of iterations for each point
+
+    Returns
+    -------
+    list of int
+        Output value
+    """
+    x_min, x_max = -2.0, 1.0
+    y_min, y_max = -1.5, 1.5
+
+    x_values = np.linspace(x_min, x_max, 100)
+    y_values = np.linspace(y_min, y_max, 100)
+    n_iterations = []
+
+    for x in x_values:
+        for y in y_values:
+            c = complex(x, y)
+            n_iterations.append(mandelbrot_point(c))
+    
+    return n_iterations
+
 if __name__ == "__main__":
 
     #testing the function, returns 100 = max_iter
     print(mandelbrot_point(0))
+
+    n_iterations = compute_mandelbrot()
+
         
