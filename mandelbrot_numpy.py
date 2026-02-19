@@ -4,23 +4,7 @@ Author : Chiara Caselli
 Course : Numerical Scientific Computing 2026
 """
 import numpy as np
-import time
 import matplotlib.pyplot as plt
-import time, statistics
-
-def benchmark(func, * args, n_runs=3) :
-    """ Time func, return median of n_runs. """
-    times = []
-    for _ in range(n_runs):
-        t0 = time.perf_counter()
-        result = func(*args)
-        times.append(time.perf_counter() - t0)
-
-    median_t = statistics.median(times)
-    print (f"Median: {median_t:.4f}s (min={min(times):.4f}, max={max(times):.4f})")
-
-    return median_t, result
-
 
 def mandelbrot_point(C, max_iter):
     """
@@ -82,6 +66,4 @@ if __name__ == "__main__":
     plt.colorbar()
     plt.title('Mandelbrot')
     plt.show()
-    plt.savefig('mandelbrot.png')
-
-    t, M = benchmark(compute_mandelbrot, -2, 1, -1.5, 1.5, 1024, 1024, 100)        
+    plt.savefig('mandelbrot.png')     
