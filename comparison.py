@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 import numpy as np
 
 from mandelbrot_naive import compute_mandelbrot as mb_naive
@@ -29,3 +30,17 @@ if __name__ == "__main__":
         diff = np.abs(M_naive - M_numpy)
         print(f"Max difference: {diff.max()}")
         print(f"Different pixels: {(diff > 0).sum()}")
+
+    #plot of runtime comparisons with different grid sizes
+    grid_sizes = [256, 512, 1024, 2048, 4096]
+    times = []
+
+    for size in grid_sizes:
+        t, _ = benchmark(mb_numpy, 2, 1, -1.5, 1.5, size, size, 100)
+        times.append(t)
+    
+    plt.plot(grid_sizes, times)
+    plt.xlabel('Grid size (N x N)')
+    plt.ylabel('Runtime (seconds)')
+    plt.title('Runtime plot')
+    plt.show()
