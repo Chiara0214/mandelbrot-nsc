@@ -3,12 +3,16 @@ Mandelbrot Set Generator
 Author : Chiara Caselli
 Course : Numerical Scientific Computing 2026
 """
+import os
 from tracemalloc import start
+import line_profiler
 import numpy as np
 import time
 import matplotlib.pyplot as plt
 
-def mandelbrot_point(c, max_iter):
+os.environ['LINE_PROFILE'] = '1'
+
+def mandelbrot_point(c, max_iter=100):
     """
     Function that takes a complex number c as input and returns the number of iterations
 
@@ -32,6 +36,7 @@ def mandelbrot_point(c, max_iter):
 
     return max_iter
 
+@line_profiler.profile
 def compute_mandelbrot(x_min=-2.0, x_max=1.0, y_min=-1.5, y_max=1.5, width=1024, height=1024, max_iter=100):
     """
     Function that returns a list with the number of iterations for each point given a region and a resolution

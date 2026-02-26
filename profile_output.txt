@@ -1,0 +1,39 @@
+Timer unit: 1e-07 s
+
+Total time: 91.877 s
+File: c:\Users\Chiara\Desktop\Uni\II\nsc-course\mandelbrot-nsc\mandelbrot_naive.py
+Function: compute_mandelbrot at line 39
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    39                                           @line_profiler.profile
+    40                                           def compute_mandelbrot(x_min=-2.0, x_max=1.0, y_min=-1.5, y_max=1.5, width=1024, height=1024, max_iter=100):
+    41                                               """
+    42                                               Function that returns a list with the number of iterations for each point given a region and a resolution
+    43                                           
+    44                                               Parameters
+    45                                               ----------
+    46                                               x_min : float
+    47                                               x_max : float
+    48                                               y_min : float
+    49                                               y_max : float
+    50                                               width : int
+    51                                               height : int
+    52                                           
+    53                                               Returns
+    54                                               -------
+    55                                               list of int
+    56                                               """
+    57                                           
+    58         1       2488.0   2488.0      0.0      x_values = np.linspace(x_min, x_max, width)
+    59         1       1057.0   1057.0      0.0      y_values = np.linspace(y_min, y_max, height)
+    60         1        260.0    260.0      0.0      n_iterations = np.zeros((width, height), dtype=int)
+    61                                           
+    62      1025      18614.0     18.2      0.0      for i, x in enumerate(x_values):
+    63   1049600   16935849.0     16.1      1.8          for j, y in enumerate(y_values):
+    64   1048576   17786515.0     17.0      1.9              c = complex(x, y)
+    65   1048576  884025243.0    843.1     96.2              n_iterations[i, j] = mandelbrot_point(c, max_iter)
+    66                                               
+    67         1          9.0      9.0      0.0      return n_iterations
+
+ 91.88 seconds - c:\Users\Chiara\Desktop\Uni\II\nsc-course\mandelbrot-nsc\mandelbrot_naive.py:39 - compute_mandelbrot
