@@ -1,7 +1,7 @@
 from mandelbrot_naive import compute_mandelbrot as mb_naive
 from mandelbrot_numpy import compute_mandelbrot as mb_numpy
 
-import cProfile , pstats
+import cProfile, pstats
 
 if __name__ == "__main__":
 
