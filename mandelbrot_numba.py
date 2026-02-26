@@ -15,7 +15,7 @@ def bench (fn, *args, runs=5) :
     for _ in range(runs):
         t0 = time.perf_counter()
         fn(*args)
-        times . append (time.perf_counter() - t0)
+        times.append(time.perf_counter() - t0)
     return statistics.median(times)
 
 @njit

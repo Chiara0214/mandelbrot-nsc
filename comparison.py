@@ -1,46 +1,40 @@
 from matplotlib import pyplot as plt
-import numpy as np
+import time, statistics
 
 from mandelbrot_naive import compute_mandelbrot as mb_naive
 from mandelbrot_numpy import compute_mandelbrot as mb_numpy
-import time, statistics
+from mandelbrot_numba import compute_mandelbrot_numba as mb_numba
 
-def benchmark(func, * args, n_runs=3) :
-    """ Time func, return median of n_runs. """
+def bench (fn , * args , runs =5) :
+    fn (*args ) # warm-up
     times = []
-    for _ in range(n_runs):
+    for _ in range (runs) :
         t0 = time.perf_counter()
-        result = func(*args)
+        fn(*args)
         times.append(time.perf_counter() - t0)
-
-    median_t = statistics.median(times)
-    print (f"Median: {median_t:.4f}s (min={min(times):.4f}, max={max(times):.4f})")
-
-    return median_t, result
+    return statistics.median(times)
 
 if __name__ == "__main__":
-    t_naive, M_naive = benchmark(mb_naive, -2, 1, -1.5, 1.5, 1024, 1024, 100)
-    t_numpy, M_numpy = benchmark(mb_numpy, -2, 1, -1.5, 1.5, 1024, 1024, 100)
 
-    if np.allclose(M_naive, M_numpy):
-        print("Results match!")
-    else:
-        print("Results differ!")
-
-        diff = np.abs(M_naive - M_numpy)
-        print(f"Max difference: {diff.max()}")
-        print(f"Different pixels: {(diff > 0).sum()}")
+    width, height = 1024 , 1024
+    args = (-2, 1, -1.5, 1.5, width, height, 100)
+    t_naive = bench(mb_naive, *args)
+    t_numpy = bench(mb_numpy, *args)
+    t_numba = bench(mb_numba, *args)
+    print (f"Naive: { t_naive:.3f}s")
+    print (f"NumPy: { t_numpy:.3f}s ({ t_naive / t_numpy:.1f}x)")
+    print (f"Numba: { t_numba:.3f}s ({ t_naive / t_numba:.1f}x)")
 
     #plot of runtime comparisons with different grid sizes
-    grid_sizes = [256, 512, 1024, 2048, 4096]
+    """ grid_sizes = [256, 512, 1024, 2048, 4096]
     times = []
 
     for size in grid_sizes:
-        t, _ = benchmark(mb_numpy, 2, 1, -1.5, 1.5, size, size, 100)
+        t = bench(mb_numpy, *args)
         times.append(t)
     
     plt.plot(grid_sizes, times)
     plt.xlabel('Grid size (N x N)')
     plt.ylabel('Runtime (seconds)')
     plt.title('Runtime plot')
-    plt.show()
+    plt.show() """
