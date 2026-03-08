@@ -47,11 +47,46 @@ def mandelbrot_parallel(N, x_min, x_max, y_min, y_max, max_iter=100, n_workers=4
     return np.vstack(parts)
 
 if __name__ == '__main__':
-    _ = mandelbrot_serial(1024, -2.5, 1.0, -1.25, 1.25) #warm-up
-    start = time.perf_counter()
-    result = mandelbrot_serial(1024, -2.5, 1.0, -1.25, 1.25)
-    end = time.perf_counter()
 
-    duration = end - start
-    print(f"Time: {duration:.6f} seconds")
-    print(f"Result: {result}")
+    result = mandelbrot_parallel(1024, -2.5, 1.0, -1.25, 1.25, n_workers=4)
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.imshow(result, extent=[-2.5, 1.0, -1.25, 1.25],
+    cmap='inferno', origin='lower', aspect='equal')
+    ax.set_xlabel('Re(c)')
+    ax.set_ylabel('Im(c)')
+
+    out = Path(__file__).parent.parent / 'outputs' / 'mandelbrot.png'
+    fig.savefig(out, dpi=150)
+    print(f'Saved: {out}')
+
+    # --- MP2 M3: benchmark (in __main__ block) ---
+    N, max_iter = 1024, 100
+    X_MIN, X_MAX, Y_MIN, Y_MAX = -2.5, 1.0, -1.25, 1.25
+
+    # Serial baseline
+    _ = mandelbrot_serial(N, X_MIN, X_MAX, Y_MIN, Y_MAX, max_iter) #warm-up
+    times = []
+    for _ in range(3):
+        t0 = time.perf_counter()
+        mandelbrot_serial(N, X_MIN, X_MAX, Y_MIN, Y_MAX, max_iter)
+        times.append(time.perf_counter() - t0)
+        t_serial = statistics.median(times)
+
+    for n_workers in range(1, os.cpu_count() + 1):
+        chunk_size = max(1, N // n_workers)
+        chunks, row = [], 0
+        while row < N:
+            end = min(row + chunk_size, N)
+            chunks.append((row, end, N, X_MIN, X_MAX, Y_MIN, Y_MAX, max_iter))
+            row = end
+        with Pool(processes=n_workers) as pool:
+            pool.map(_worker, chunks) # warm-up: Numba JIT in all workers
+            times = []
+            for _ in range(3):
+                t0 = time.perf_counter()
+                np.vstack(pool.map(_worker, chunks))
+                times.append(time.perf_counter() - t0)
+        t_par = statistics.median(times)
+        speedup = t_serial / t_par
+        print(f"{n_workers:2d} workers: {t_par:.3f}s, speedup={speedup:.2f}x, eff={speedup/n_workers*100:.0f}%")
