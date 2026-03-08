@@ -3,31 +3,40 @@ Mandelbrot Set Generator
 Author : Chiara Caselli
 Course : Numerical Scientific Computing 2026
 """
+import os
+from tracemalloc import start
+import line_profiler
 import numpy as np
+import time
 import matplotlib.pyplot as plt
 
-def mandelbrot_point(C, max_iter):
+#os.environ['LINE_PROFILE'] = '1'
+
+def mandelbrot_point(c, max_iter=100):
     """
-    Function that takes np.meshgrid C of complex numbers as input and returns meshgrid M with number of iterations
+    Function that takes a complex number c as input and returns the number of iterations
 
     Parameters
     ----------
-    C : np.meshgrid
+    c : complex
+        Input value
 
     Returns
     -------
-    M : np.meshgrid
+    int
+        Output value
     """
-    Z = np.zeros(C.shape, dtype=complex)
-    M = np.zeros(C.shape, dtype=int) #iterations
+    z_n = 0
+    max_iter = 100
 
-    for _ in range(max_iter):
-        mask = np.abs(Z) <= 2
-        Z[mask] = Z[mask]**2 + C[mask] #updates z for all complex numbers with abs<=2
-        M[mask] += 1 #updates iterations for all complex numbers with abs<=2
+    for n in range(max_iter):
+        z_n = z_n**2 + c
+        if abs(z_n) > 2:
+            return n
 
-    return M
+    return max_iter
 
+#@line_profiler.profile
 def compute_mandelbrot(x_min=-2.0, x_max=1.0, y_min=-1.5, y_max=1.5, width=1024, height=1024, max_iter=100):
     """
     Function that returns a list with the number of iterations for each point given a region and a resolution
@@ -48,22 +57,28 @@ def compute_mandelbrot(x_min=-2.0, x_max=1.0, y_min=-1.5, y_max=1.5, width=1024,
 
     x_values = np.linspace(x_min, x_max, width)
     y_values = np.linspace(y_min, y_max, height)
-    X, Y = np.meshgrid(x_values, y_values)
-    C = X + 1j*Y
+    n_iterations = np.zeros((width, height), dtype=int)
 
-    print (f"Shape: {C.shape }") # (1024, 1024)
-    print (f"Type: {C.dtype }") 
-
-    n_iterations = mandelbrot_point(C, max_iter)
+    for i, x in enumerate(x_values):
+        for j, y in enumerate(y_values):
+            c = complex(x, y)
+            n_iterations[i, j] = mandelbrot_point(c, max_iter)
     
     return n_iterations
 
 if __name__ == "__main__":
 
+    #testing the function, returns 100 = max_iter
+    print(mandelbrot_point(0))
+
+    start = time.time()
+
     n_iterations = compute_mandelbrot()
+
+    elapsed = time.time() - start
+    print(f"Computation took {elapsed:.3f} seconds")
 
     plt.imshow(n_iterations, extent=(-2, 1, -1.5, 1.5), cmap='twilight', origin='lower')
     plt.colorbar()
     plt.title('Mandelbrot')
     plt.show()
-    plt.savefig('mandelbrot.png')     

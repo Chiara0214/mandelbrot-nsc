@@ -3,31 +3,12 @@ Mandelbrot Set Generator
 Author : Chiara Caselli
 Course : Numerical Scientific Computing 2026
 """
-import statistics
-
 from matplotlib import pyplot as plt
 import numpy as np
 import time
 from numba import njit
 
-def bench (fn, *args, runs=5) :
-    fn (*args) # extra warm -up
-    times = []
-    for _ in range(runs):
-        t0 = time.perf_counter()
-        fn(*args)
-        times.append(time.perf_counter() - t0)
-    return statistics.median(times)
-
-@njit
-def mandelbrot_point(c, max_iter=100):
-    z_n = 0j
-
-    for n in range(max_iter):
-        if z_n.real * z_n.real + z_n.imag * z_n.imag > 4.0:
-            return n
-        z_n = z_n * z_n + c
-    return max_iter
+from utils import bench
 
 @njit
 def compute_mandelbrot_numba(x_min=-2.0, x_max=1.0, y_min=-1.5, y_max=1.5, width=1024, height=1024, max_iter=100):
@@ -47,6 +28,16 @@ def compute_mandelbrot_numba(x_min=-2.0, x_max=1.0, y_min=-1.5, y_max=1.5, width
             result [i, j ] = n
 
     return result
+
+@njit
+def mandelbrot_point(c, max_iter=100):
+    z_n = 0j
+
+    for n in range(max_iter):
+        if z_n.real * z_n.real + z_n.imag * z_n.imag > 4.0:
+            return n
+        z_n = z_n * z_n + c
+    return max_iter
 
 def compute_mandelbrot_hybrid(x_min=-2.0, x_max=1.0, y_min=-1.5, y_max=1.5, width=1024, height=1024, max_iter=100):
     x_values = np.linspace(x_min, x_max, width)
@@ -91,6 +82,7 @@ if __name__ == "__main__":
     print(f"Fully compiled: { t_full:.3f}s")
     print(f"Ratio: { t_hybrid / t_full:.1f}x")
 
+    #Precision comparisons
     for dtype in [np.float32, np.float64]:
         t0 = time.perf_counter()
         mandelbrot_numba_typed(-2, 1, -1.5, 1.5, 1024, 1024, 100, dtype)
@@ -100,8 +92,8 @@ if __name__ == "__main__":
     r64 = mandelbrot_numba_typed( -2 , 1 , -1.5 , 1.5 , 1024 , 1024 , dtype = np.float64 )
     fig, axes = plt.subplots(1, 3, figsize =(12 , 4))
 
-    for ax , result , title in zip ( axes, [r32, r64] , ['float32 ', 'float64 (ref)']) :
+    for ax , result , title in zip ( axes, [r32, r64] , ['float32', 'float64 (ref)']) :
         ax.imshow(result, cmap ='hot')
         ax.set_title(title); ax.axis ('off')
-        plt.savefig('precision_comparison.png', dpi=150)
+        plt.savefig('outputs/precision_comparison.png', dpi=150)
         print(f"Max diff float32 vs float64: {np.abs(r32 - r64).max()}")

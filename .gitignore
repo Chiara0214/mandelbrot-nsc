@@ -1,0 +1,6 @@
+__pycache__/
+
+*.prof
+*.lprof
+
+log.txt
