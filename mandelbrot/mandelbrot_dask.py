@@ -39,10 +39,12 @@ if __name__ == '__main__':
     N, max_iter = 1024, 100
     X_MIN, X_MAX, Y_MIN, Y_MAX = -2.5, 1.0, -1.25, 1.25
     n_workers = 8
-    cluster = LocalCluster(n_workers, threads_per_worker=1)
-    client = Client(cluster)
+    #cluster = LocalCluster(n_workers, threads_per_worker=1)
+    #client = Client(cluster)
+    client = Client("tcp://10.92.1.201:8786")
 
-    mandelbrot_chunk(0, 8, 8, X_MIN, X_MAX, Y_MIN, Y_MAX, max_iter) # warm up JIT
+    #mandelbrot_chunk(0, 8, 8, X_MIN, X_MAX, Y_MIN, Y_MAX, max_iter) # warm up JIT
+    client.run(lambda: mandelbrot_chunk(0, 8, 8, X_MIN, X_MAX, Y_MIN, Y_MAX, 10))
     
     # Serial baseline
     times = []
@@ -67,4 +69,4 @@ if __name__ == '__main__':
         t = statistics.median(times)
         print(f"Dask local (n_chunks={n}):{t:.3f}s, LIF: {n_workers * t / t_serial - 1:.2f}")
 
-    client.close(); cluster.close()
+    client.close(); #cluster.close()
