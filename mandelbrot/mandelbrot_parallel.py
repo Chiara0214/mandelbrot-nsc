@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
     # --- MP2 M3: benchmark (in __main__ block) ---
 
-    N, max_iter = 1024, 100
+    N, max_iter = 8192, 100
     n_workers = 12 # adjust to your L04 optimum
     X_MIN, X_MAX, Y_MIN, Y_MAX = -2.5, 1.0, -1.25, 1.25
     
