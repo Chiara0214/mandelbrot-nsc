@@ -3,31 +3,30 @@ Mandelbrot Set Generator
 Author : Chiara Caselli
 Course : Numerical Scientific Computing 2026
 """
-import os
 from tracemalloc import start
-import line_profiler
 import numpy as np
 import time
 import matplotlib.pyplot as plt
 
 #os.environ['LINE_PROFILE'] = '1'
 
-def mandelbrot_point(c, max_iter=100):
+def mandelbrot_point(c: complex, max_iter: int = 100) -> int:
     """
-    Function that takes a complex number c as input and returns the number of iterations
+    Compute the escape iteration count for a single complex point
 
     Parameters
     ----------
     c : complex
-        Input value
+        Complex coordinate to test
+    max_iter : int, optional
+        Maximum number of iterations to perform
 
     Returns
     -------
     int
-        Output value
+        Iteration count at which the trajectory escapes, or max_iter if it stays bounded within the iteration limit
     """
-    z_n = 0
-    max_iter = 100
+    z_n = 0j
 
     for n in range(max_iter):
         z_n = z_n**2 + c
@@ -37,22 +36,39 @@ def mandelbrot_point(c, max_iter=100):
     return max_iter
 
 #@line_profiler.profile
-def compute_mandelbrot(x_min=-2.0, x_max=1.0, y_min=-1.5, y_max=1.5, width=1024, height=1024, max_iter=100):
+def compute_mandelbrot(
+    x_min: float = -2.0,
+    x_max: float = 1.0,
+    y_min: float = -1.5,
+    y_max: float = 1.5,
+    width: int = 1024,
+    height: int = 1024,
+    max_iter: int = 100,
+) -> np.ndarray:
     """
-    Function that returns a list with the number of iterations for each point given a region and a resolution
+    Compute Mandelbrot escape counts on a rectangular grid
 
     Parameters
     ----------
     x_min : float
+        Minimum real value in the sampled region
     x_max : float
+        Maximum real value in the sampled region
     y_min : float
+        Minimum imaginary value in the sampled region
     y_max : float
+        Maximum imaginary value in the sampled region
     width : int
+        Number of grid points along the real axis
     height : int
+        Number of grid points along the imaginary axis
+    max_iter : int, optional
+        Maximum number of iterations used for each point
 
     Returns
     -------
-    list of int
+    np.ndarray
+        Two-dimensional array of escape iteration counts for the sampled grid points
     """
 
     x_values = np.linspace(x_min, x_max, width)
