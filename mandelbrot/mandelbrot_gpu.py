@@ -1,9 +1,8 @@
 import pyopencl as cl
 import numpy as np
-import time, matplotlib.pyplot as plt
 import time
-import statistics
 import matplotlib.pyplot as plt
+import statistics
 
 KERNEL_SRC_F32 = """
 __kernel void mandelbrot(
@@ -108,7 +107,8 @@ if __name__ == "__main__":
                                             np.int32(N), np.int32(MAX_ITER)))
     
     print(f"GPU {N}x{N} f32: {bench_f32*1e3:.3f} ms")
-    plt.imshow(img32, cmap='hot', origin='lower'); plt.axis('off')
+    plt.imshow(img32, cmap='hot', origin='lower')
+    plt.axis('off')
     plt.savefig("mandelbrot_gpu_f32.png", dpi=150, bbox_inches='tight')
 
 
@@ -130,7 +130,8 @@ if __name__ == "__main__":
                                                       np.int32(N), np.int32(MAX_ITER)))
         
         print(f"GPU {N}x{N} f64: {bench_f64*1e3:.3f} ms")
-        plt.imshow(img64, cmap='hot', origin='lower'); plt.axis('off')
+        plt.imshow(img64, cmap='hot', origin='lower')
+        plt.axis('off')
         plt.savefig("mandelbrot_gpu_f64.png", dpi=150, bbox_inches='tight')
 
     # Bar chart

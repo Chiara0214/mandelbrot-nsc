@@ -8,53 +8,73 @@ import matplotlib.pyplot as plt
 
 from utils import bench
 
-def mandelbrot_point(C, max_iter):
+def mandelbrot_point(C: np.ndarray, max_iter: int) -> np.ndarray:
     """
-    Function that takes np.meshgrid C of complex numbers as input and returns meshgrid M with number of iterations
+    Computes the escape iteration for a grid of complex points using vectorized operations
 
     Parameters
     ----------
-    C : np.meshgrid
+    C : np.ndarray
+        A 2D numpy array of complex numbers representing the grid coordinates
+    max_iter : int
+        The maximum number of iterations before assuming the point is in the set
 
     Returns
     -------
-    M : np.meshgrid
+    np.ndarray
+        A 2D numpy array of integers containing the iteration count for each point
     """
     Z = np.zeros(C.shape, dtype=complex)
-    M = np.zeros(C.shape, dtype=int) #iterations
+    M = np.zeros(C.shape, dtype=int) # iterations
 
     for _ in range(max_iter):
         mask = np.abs(Z) <= 2
-        Z[mask] = Z[mask]**2 + C[mask] #updates z for all complex numbers with abs<=2
-        M[mask] += 1 #updates iterations for all complex numbers with abs<=2
+        Z[mask] = Z[mask]**2 + C[mask] # updates z for all complex numbers with abs<=2
+        M[mask] += 1 # updates iterations for all complex numbers with abs<=2
 
     return M
 
-def compute_mandelbrot(x_min=-2.0, x_max=1.0, y_min=-1.5, y_max=1.5, width=1024, height=1024, max_iter=100):
+def compute_mandelbrot(
+    x_min: float = -2.0, 
+    x_max: float = 1.0, 
+    y_min: float = -1.5, 
+    y_max: float = 1.5, 
+    width: int = 1024, 
+    height: int = 1024, 
+    max_iter: int = 100
+) -> np.ndarray:
     """
-    Function that returns a list with the number of iterations for each point given a region and a resolution
+    Generates the Mandelbrot set for a specified spatial region and grid resolution
 
     Parameters
     ----------
-    x_min : float
-    x_max : float
-    y_min : float
-    y_max : float
-    width : int
-    height : int
+    x_min : float, optional
+        The minimum real coordinate, by default -2.0
+    x_max : float, optional
+        The maximum real coordinate, by default 1.0
+    y_min : float, optional
+        The minimum imaginary coordinate, by default -1.5
+    y_max : float, optional
+        The maximum imaginary coordinate, by default 1.5
+    width : int, optional
+        The number of grid points along the real axis, by default 1024
+    height : int, optional
+        The number of grid points along the imaginary axis, by default 1024
+    max_iter : int, optional
+        The maximum number of iterations to compute, by default 100
 
     Returns
     -------
-    list of int
+    np.ndarray
+        A 2D array of iteration counts corresponding to each pixel in the grid
     """
-
     x_values = np.linspace(x_min, x_max, width)
     y_values = np.linspace(y_min, y_max, height)
     X, Y = np.meshgrid(x_values, y_values)
-    C = X + 1j*Y
+    C = X + 1j * Y
 
-    print (f"Shape: {C.shape }") # (1024, 1024)
-    print (f"Type: {C.dtype }") 
+    print(f"Shape: {C.shape}") # (height, width)
+    print(f"Type: {C.dtype}") 
 
     n_iterations = mandelbrot_point(C, max_iter)
     
@@ -69,7 +89,7 @@ if __name__ == "__main__":
     plt.title('Mandelbrot')
     plt.show()
 
-    #plot of runtime comparisons with different grid sizes
+    # plot of runtime comparisons with different grid sizes
     grid_sizes = [256, 512, 1024, 2048, 4096]
     times = []
 
