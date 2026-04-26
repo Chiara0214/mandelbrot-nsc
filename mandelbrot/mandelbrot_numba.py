@@ -16,8 +16,8 @@ def compute_mandelbrot_numba(x_min=-2.0, x_max=1.0, y_min=-1.5, y_max=1.5, width
     y = np.linspace(y_min, y_max, height)
     result = np.zeros((height, width), dtype = np.int32)
 
-    for i in range ( height ):
-        for j in range ( width ):
+    for i in range (height):
+        for j in range (width):
             c = x[j] + 1j * y[i]
             z = 0j
             n = 0
@@ -64,9 +64,9 @@ def mandelbrot_numba_typed(xmin, xmax, ymin, ymax, width, height, max_iter=100, 
 
 if __name__ == "__main__":
 
-    _ = compute_mandelbrot_numba(-2, 1, -1.5, 1.5, 64 , 64) #warm-up
+    _ = compute_mandelbrot_numba(-2.0, 1.0, -1.5, 1.5, 64 , 64) #warm-up
     start = time.perf_counter()
-    result = compute_mandelbrot_numba( -2, 1, -1.5, 1.5, 1024, 1024)
+    result = compute_mandelbrot_numba(-2.0, 1.0, -1.5, 1.5, 1024, 1024)
     end = time.perf_counter()
 
     duration = end - start
@@ -74,22 +74,25 @@ if __name__ == "__main__":
     print(f"Result: {result}")
 
     #Warm up (triggers JIT compilation -- exclude from timing)
-    _ = compute_mandelbrot_hybrid( -2, 1, -1.5, 1.5, 64, 64)
-    _ = compute_mandelbrot_numba( -2, 1, -1.5, 1.5, 64, 64)
-    t_hybrid = bench(compute_mandelbrot_hybrid, -2, 1, -1.5, 1.5, 1024, 1024)
-    t_full = bench(compute_mandelbrot_numba, -2, 1 , -1.5, 1.5, 1024, 1024)
+    _ = compute_mandelbrot_hybrid(-2.0, 1.0, -1.5, 1.5, 64, 64)
+    _ = compute_mandelbrot_numba(-2.0, 1.0, -1.5, 1.5, 64, 64)
+    t_hybrid = bench(compute_mandelbrot_hybrid, -2.0, 1.0, -1.5, 1.5, 1024, 1024)
+    t_full = bench(compute_mandelbrot_numba, -2.0, 1.0 , -1.5, 1.5, 1024, 1024)
     print(f"Hybrid: { t_hybrid:.3f}s")
     print(f"Fully compiled: { t_full:.3f}s")
     print(f"Ratio: { t_hybrid / t_full:.1f}x")
 
     #Precision comparisons
     for dtype in [np.float32, np.float64]:
+        #warm-up
+        _ = mandelbrot_numba_typed(-2.0, 1.0, -1.5, 1.5, 64, 64, 100, dtype)
+        
         t0 = time.perf_counter()
-        mandelbrot_numba_typed(-2, 1, -1.5, 1.5, 1024, 1024, 100, dtype)
+        mandelbrot_numba_typed(-2.0, 1.0, -1.5, 1.5, 1024, 1024, 100, dtype)
         print(f"{ dtype.__name__ }: {time.perf_counter() - t0:.3f}s")
     
-    r32 = mandelbrot_numba_typed( -2 , 1 , -1.5 , 1.5 , 1024 , 1024 , dtype = np.float32 )
-    r64 = mandelbrot_numba_typed( -2 , 1 , -1.5 , 1.5 , 1024 , 1024 , dtype = np.float64 )
+    r32 = mandelbrot_numba_typed(-2.0, 1.0, -1.5, 1.5, 1024, 1024, dtype = np.float32)
+    r64 = mandelbrot_numba_typed(-2.0, 1.0, -1.5, 1.5, 1024, 1024, dtype = np.float64)
     fig, axes = plt.subplots(1, 3, figsize =(12 , 4))
 
     for ax , result , title in zip ( axes, [r32, r64] , ['float32', 'float64 (ref)']) :
